@@ -170,7 +170,7 @@ export default class TransactionScreen extends Component {
 
 
     this.setState({
-      // 05) atualizar estados LOCAIS studentId e bookId
+      // 04) atualizar estados LOCAIS studentId e bookId
     });
   };
 
