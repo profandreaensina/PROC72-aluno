@@ -8,8 +8,8 @@ import {
   ImageBackground,
   Image,
   Alert,
-  ToastAndroid,
-  KeyboardAvoidingView
+  // 01) importar comp keyboard
+  // 02) importar comp toast
 } from "react-native";
 import * as Permissions from "expo-permissions";
 import { BarCodeScanner } from "expo-barcode-scanner";
@@ -38,9 +38,6 @@ export default class TransactionScreen extends Component {
     const { status } = await Permissions.askAsync(Permissions.CAMERA);
 
     this.setState({
-      /*status === "granted" é verdadeiro se o usuário concedeu permissão
-          status === "granted" é falso se o usuário não concedeu permissão
-        */
       hasCameraPermissions: status === "granted",
       domState: domState,
       scanned: false
@@ -79,18 +76,13 @@ export default class TransactionScreen extends Component {
           var { bookName, studentName } = this.state;
           this.initiateBookIssue(bookId, studentId, bookName, studentName);
 
-          // Apenas para usuários do Android
-          ToastAndroid.show("Livro entregue para o aluno!", ToastAndroid.SHORT);
-
-          // Alert.alert("Book issued to the student!");
+          // 03) mostrar mensagem quando a transição for finalizada
+          
         } else {
           var { bookName, studentName } = this.state;
           this.initiateBookReturn(bookId, studentId, bookName, studentName);
 
-          // Apenas para usuários do Android
           ToastAndroid.show("Livro retornado à biblioteca!", ToastAndroid.SHORT);
-
-          // Alert.alert("Book returned to the library!");
         }
       });
   };
@@ -124,7 +116,7 @@ export default class TransactionScreen extends Component {
   };
 
   initiateBookIssue = async (bookId, studentId, bookName, studentName) => {
-    //adicionar uma transação
+
     db.collection("transactions").add({
       student_id: studentId,
       student_name: studentName,
@@ -133,20 +125,20 @@ export default class TransactionScreen extends Component {
       date: firebase.firestore.Timestamp.now().toDate(),
       transaction_type: "issue"
     });
-    //alterar status do livro
+
     db.collection("books")
       .doc(bookId)
       .update({
         is_book_available: false
       });
-    // alterar o número de livros retirados pelo aluno
+
     db.collection("students")
       .doc(studentId)
       .update({
         number_of_books_issued: firebase.firestore.FieldValue.increment(1)
       });
 
-    // atualizando estado local
+
     this.setState({
       bookId: "",
       studentId: ""
@@ -154,7 +146,7 @@ export default class TransactionScreen extends Component {
   };
 
   initiateBookReturn = async (bookId, studentId, bookName, studentName) => {
-    // adicionar uma transação
+
     db.collection("transactions").add({
       student_id: studentId,
       student_name: studentName,
@@ -163,23 +155,22 @@ export default class TransactionScreen extends Component {
       date: firebase.firestore.Timestamp.now().toDate(),
       transaction_type: "return"
     });
-    // alterar status do livro
+
     db.collection("books")
       .doc(bookId)
       .update({
         is_book_available: true
       });
-    // alterar o número de livros retirados pelo aluno
+
     db.collection("students")
       .doc(studentId)
       .update({
         number_of_books_issued: firebase.firestore.FieldValue.increment(-1)
       });
 
-    // atualizando estado local
+
     this.setState({
-      bookId: "",
-      studentId: ""
+      // 05) atualizar estados LOCAIS studentId e bookId
     });
   };
 
